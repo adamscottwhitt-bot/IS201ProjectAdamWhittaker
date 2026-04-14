@@ -1,187 +1,92 @@
-To meet your requirements, I have designed a high-end, single-file web app that ranks the world's most prestigious golf courses. 
-
-The CSS is "separated" into a dedicated block within the `<head>` of the document to maintain clean structure while keeping everything in a single portable file. I have also used a deep "Fairway Green" gradient background and high-quality photography to give it a professional look.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Masters' Choice: Global Golf Rankings 2026</title>
-    
-    <style>
-        /* Custom Background and Global Styles */
-        body {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                        url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?auto=format&fit=crop&w=1920&q=80');
-            background-attachment: fixed;
-            background-size: cover;
-            color: #f4f4f4;
-            font-family: 'Garamond', serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            scroll-behavior: smooth;
-        }
-
-        header {
-            background-color: rgba(27, 94, 32, 0.9); /* Augusta Green */
-            width: 100%;
-            padding: 20px 0;
-            text-align: center;
-            border-bottom: 3px solid #d4af37; /* Gold Trim */
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        nav a {
-            color: #d4af37;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .container {
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            margin: 40px 20px;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        h1, h2 {
-            color: #d4af37;
-            text-align: center;
-        }
-
-        /* Image Styling */
-        .course-img {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 2px solid #d4af37;
-        }
-
-        /* List Styling: Nested Rubric Requirement */
-        ol.ranking-list {
-            font-size: 1.3rem;
-            line-height: 1.8;
-        }
-
-        ol.ranking-list > li {
-            margin-bottom: 30px;
-            font-weight: bold;
-            color: #ffffff;
-        }
-
-        ul.course-features {
-            font-size: 1rem;
-            font-weight: normal;
-            color: #cccccc;
-            list-style-type: square;
-        }
-
-        /* Video Section */
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            height: 0;
-            margin: 30px 0;
-        }
-
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 10px;
-        }
-
-        footer {
-            margin-bottom: 40px;
-            font-style: italic;
-            opacity: 0.7;
-        }
-    </style>
+    <title>World's Best Vacation Spots</title>
+    <link rel="stylesheet" href="css/awstyles.css">
 </head>
 <body>
 
-    <header>
+    <div id="header-section">
+        <h1>Explore the World</h1>
+        <p>A guide to the most popular destinations.</p>
         <nav>
-            <a href="#rankings-section">Jump to 2026 Rankings</a>
+            <a href="index.html">My Nice Resume Page</a> | 
+            <a href="#multimedia-section">Jump to Video & Data</a>
+            <a href="ai_app.html">My Cool AI Page</a>
         </nav>
-    </header>
+    </div>
 
-    <div class="container">
-        <h1>The World's Greatest Courses</h1>
-        <p style="text-align: center;">A definitive ranking of the cathedrals of golf, updated for the 2026 season.</p>
+    <hr>
 
-        <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1200&q=80" 
-             alt="St Andrews Old Course Bridge" class="course-img">
+    <div class="main-content">
+        <h2>Top Rated Destinations</h2>
+        <p>Traveling allows us to experience new cultures and beautiful landscapes. Here are some favorites:</p>
 
-        <h2 id="rankings-section">Official 2026 Rankings</h2>
-
-        <ol class="ranking-list">
-            <li>Pine Valley Golf Club (Clementon, New Jersey)
-                <ul class="course-features">
-                    <li>Ranked #1 for technical difficulty and variety.</li>
-                    <li>Exclusive, private membership located in the New Jersey pine barrens.</li>
-                    <li>Famous for "Hell's Half Acre," a massive sandy waste area on the 7th hole.</li>
+        <ol>
+            <li><strong>Paris, France</strong>
+                <ul>
+                    <li>The Eiffel Tower</li>
+                    <li>The Louvre Museum</li>
                 </ul>
             </li>
-            <li>Pebble Beach Golf Links (Pebble Beach, California)
-                <ul class="course-features">
-                    <li>Arguably the most famous public course in the world.</li>
-                    <li>Features legendary cliffside holes overlooking the Pacific Ocean.</li>
-                    <li>Consistent host of the U.S. Open.</li>
+            <li><strong>Bali, Indonesia</strong>
+                <ul>
+                    <li>Uluwatu Temple</li>
+                    <li>Tegallalang Rice Terrace</li>
                 </ul>
             </li>
-            <li>St Andrews Links - Old Course (St Andrews, Scotland)
-                <ul class="course-features">
-                    <li>Known as the "Home of Golf," dating back to the 15th century.</li>
-                    <li>Includes iconic landmarks like the Swilcan Bridge and the Road Hole.</li>
-                    <li>The ultimate bucket-list destination for every golfer.</li>
-                </ul>
-            </li>
-            <li>Augusta National Golf Club (Augusta, Georgia)
-                <ul class="course-features">
-                    <li>Home of The Masters Tournament.</li>
-                    <li>Renowned for its meticulously manicured azaleas and "Amen Corner."</li>
-                    <li>Perhaps the most visually stunning landscape in professional sports.</li>
+            <li><strong>Rome, Italy</strong>
+                <ul>
+                    <li>The Colosseum</li>
+                    <li>Trevi Fountain</li>
                 </ul>
             </li>
         </ol>
 
-        <hr style="border: 0.5px solid #d4af37; margin: 40px 0;">
-
-        <h2>Course Highlight Reel</h2>
-        <p>Experience the atmosphere of these legendary links through the footage below:</p>
-
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/S_8qC9M-61I" 
-                    title="Top 10 Golf Courses" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
-        </div>
+        <h3>A Glimpse of Paradise</h3>
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Beautiful Tropical Beach" width="600">
     </div>
 
-    <footer>
-        2026 Elite Greens Digital. All course rankings subject to annual peer review.
-    </footer>
+    <div id="multimedia-section" class="media-container">
+        <h2>Travel Visuals & Data</h2>
+        
+        <h3>Travel Inspiration Video</h3>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/P_6vY_G0Y0Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+        <h3>Interactive Tourism Data</h3>
+        <div class='tableauPlaceholder' id='viz1715852538118' style='position: relative'>
+            <noscript>
+                <a href='#'><img alt='Tourism Dashboard' src='https://public.tableau.com/static/images/Wo/WorldTourism/Dashboard1/1_rss.png' style='border: none' /></a>
+            </noscript>
+            <object class='tableauViz'  style='display:none;'>
+                <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
+                <param name='embed_code_version' value='3' /> 
+                <param name='site_root' value='' />
+                <param name='name' value='WorldTourism/Dashboard1' />
+                <param name='tabs' value='no' />
+                <param name='toolbar' value='yes' />
+                <param name='static_image' value='https://public.tableau.com/static/images/Wo/WorldTourism/Dashboard1/1.png' /> 
+                <param name='animate_transition' value='yes' />
+                <param name='display_static_image' value='yes' />
+                <param name='display_spinner' value='yes' />
+                <param name='display_overlay' value='yes' />
+                <param name='display_count' value='yes' />
+                <param name='language' value='en-US' />
+            </object>
+        </div>                
+        <script type='text/javascript'>                    
+            var divElement = document.getElementById('viz1715852538118');                    
+            var vizElement = divElement.getElementsByTagName('object')[0];                    
+            vizElement.style.width='700px';vizElement.style.height='527px';                    
+            var scriptElement = document.createElement('script');                    
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);                
+        </script>
+
+        <br>
+        <p><a href="#header-section">Back to the top of the page</a></p>
+    </div>
 
 </body>
 </html>
-```
