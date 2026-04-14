@@ -1,0 +1,11 @@
+.bg-primary {
+    background-color: rgb(68, 93, 202) !important;
+}
+
+.text-primary {
+    color: rgb(68, 93, 202) !important;
+}
+
+a {
+    color: rgb(68, 93, 202) ;
+}

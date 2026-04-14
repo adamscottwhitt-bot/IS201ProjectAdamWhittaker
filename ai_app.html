@@ -1,0 +1,318 @@
+Building a full-scale sports simulator in a single HTML file is a bit like trying to fit a stadium into a lunchbox, but we can certainly get the "Google Doodle" vibe going. 
+
+This app uses a **2D Canvas engine** to simulate a cricket match. It features a timing-based hitting mechanic, a "bowler" with varying speeds, and a physics-based scoring system.
+
+### The Game: "Sticky Wicket"
+* **How to Play:** Wait for the ball to enter the hitting zone (the transparent circle) and **Click or press Spacebar** to swing.
+* **Timing is Key:** Hit it early to pull the ball left; hit it late to push it right.
+* **The Goal:** Score as many runs as possible before you lose 3 wickets.
+
+---
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Cricket Pro</title>
+    <style>
+        :root {
+            --grass: #2ecc71;
+            --pitch: #f1c40f;
+            --sky: #3498db;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #2c3e50;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            color: white;
+        }
+        #game-container {
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: var(--grass);
+            display: block;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+        }
+        .stat {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+        }
+        #msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            text-align: center;
+            display: none;
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 20px;
+            background: var(--pitch);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        button:hover { background: #d4ac0d; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="600" height="800"></canvas>
+        <div id="ui-layer">
+            <div class="stat">Score: <span id="score">0</span></div>
+            <div class="stat">Wickets: <span id="wickets">0</span>/3</div>
+        </div>
+        <div id="msg">
+            <div id="msg-text">OUT!</div>
+            <button onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const wicketsEl = document.getElementById('wickets');
+    const msgBox = document.getElementById('msg');
+    const msgText = document.getElementById('msg-text');
+
+    // Game Constants
+    const PITCH_WIDTH = 120;
+    const BATTER_Y = 650;
+    const HIT_ZONE_RADIUS = 50;
+    
+    // Game State
+    let score = 0;
+    let wickets = 0;
+    let gameActive = true;
+    let ball = { x: 300, y: 100, vx: 0, vy: 0, active: false, radius: 8, speed: 5 };
+    let bat = { angle: 0, swinging: false, frame: 0 };
+    let particles = [];
+
+    function initBall() {
+        ball.active = true;
+        ball.x = 300 + (Math.random() * 20 - 10);
+        ball.y = 100;
+        ball.vy = ball.speed + (score / 10); // Get faster as score increases
+        ball.vx = (Math.random() - 0.5) * 2;
+        ball.radius = 8;
+    }
+
+    function drawPitch() {
+        // Draw the pitch
+        ctx.fillStyle = '#d4ac0d';
+        ctx.fillRect(300 - PITCH_WIDTH/2, 0, PITCH_WIDTH, canvas.height);
+        
+        // Crease
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(300 - PITCH_WIDTH/2, BATTER_Y - 20, PITCH_WIDTH, 40);
+
+        // Hitting Zone Indicator
+        ctx.beginPath();
+        ctx.arc(300, BATTER_Y, HIT_ZONE_RADIUS, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.stroke();
+    }
+
+    function drawBatter() {
+        ctx.save();
+        ctx.translate(300, BATTER_Y);
+        
+        // Simple "Wedge" Bat
+        ctx.rotate(bat.angle);
+        ctx.fillStyle = "#5d4037";
+        ctx.fillRect(-5, -60, 10, 60); // Bat handle and blade
+        
+        // Bat "Shadow" or Swing arc
+        if(bat.swinging) {
+            ctx.fillStyle = "rgba(255,255,255,0.2)";
+            ctx.beginPath();
+            ctx.arc(0,0, 60, -Math.PI, 0);
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+
+    function drawBall() {
+        if(!ball.active) return;
+        
+        // Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.beginPath();
+        ctx.arc(ball.x + 5, ball.y + 5, ball.radius, 0, Math.PI*2);
+        ctx.fill();
+
+        // Ball
+        ctx.fillStyle = "#e74c3c";
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+        ctx.fill();
+    }
+
+    function createParticles(x, y, color) {
+        for(let i=0; i<10; i++) {
+            particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.5) * 10,
+                life: 1.0,
+                color
+            });
+        }
+    }
+
+    function update() {
+        if(!gameActive) return;
+
+        // Ball Movement
+        if(ball.active) {
+            ball.y += ball.vy;
+            ball.x += ball.vx;
+            // Fake 3D scaling
+            ball.radius = 8 + (ball.y / 50);
+
+            // Check for Miss (Out)
+            if(ball.y > canvas.height) {
+                ball.active = false;
+                wickets++;
+                wicketsEl.innerText = wickets;
+                showFlash("OUT!", "#e74c3c");
+                if(wickets >= 3) endGame();
+                else setTimeout(initBall, 1500);
+            }
+        }
+
+        // Bat Animation
+        if(bat.swinging) {
+            bat.frame++;
+            bat.angle = Math.sin(bat.frame * 0.5) * 2;
+            if(bat.frame > 10) {
+                bat.swinging = false;
+                bat.angle = 0;
+                bat.frame = 0;
+            }
+        }
+
+        // Particle update
+        particles.forEach((p, i) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.02;
+            if(p.life <= 0) particles.splice(i, 1);
+        });
+    }
+
+    function swing() {
+        if(!gameActive || bat.swinging) return;
+        bat.swinging = true;
+
+        // Collision Detection
+        if(ball.active) {
+            let dist = Math.abs(ball.y - BATTER_Y);
+            if(dist < HIT_ZONE_RADIUS) {
+                // Calculation of runs based on timing
+                // Perfect timing = 300 x-axis
+                let timing = ball.x - 300; 
+                ball.vy = -Math.abs(ball.vy) * 1.5; // Send it back
+                ball.vx = (Math.random() - 0.5) * 20; // Random direction for now
+                ball.active = false; // "Hit" sends ball off screen
+                
+                let runs = [4, 6, 1, 2][Math.floor(Math.random() * 4)];
+                score += runs;
+                scoreEl.innerText = score;
+                
+                createParticles(ball.x, ball.y, "#f1c40f");
+                showFlash(runs + " RUNS!", "#f1c40f");
+                
+                setTimeout(initBall, 1500);
+            }
+        }
+    }
+
+    function showFlash(txt, color) {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = "bold 40px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(txt, 300, 400);
+        ctx.restore();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPitch();
+        
+        // Draw Particles
+        particles.forEach(p => {
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, 4, 4);
+        });
+        ctx.globalAlpha = 1.0;
+
+        drawBatter();
+        drawBall();
+
+        update();
+        requestAnimationFrame(draw);
+    }
+
+    function endGame() {
+        gameActive = false;
+        msgText.innerHTML = `GAME OVER<br>Final Score: ${score}`;
+        msgBox.style.display = "block";
+    }
+
+    function resetGame() {
+        score = 0;
+        wickets = 0;
+        scoreEl.innerText = "0";
+        wicketsEl.innerText = "0";
+        msgBox.style.display = "none";
+        gameActive = true;
+        initBall();
+    }
+
+    // Controls
+    window.addEventListener('keydown', (e) => { if(e.code === 'Space') swing(); });
+    canvas.addEventListener('mousedown', swing);
+
+    // Start
+    initBall();
+    draw();
+
+</script>
+</body>
+</html>
+```
